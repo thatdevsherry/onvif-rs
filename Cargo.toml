@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "cli",
+    "lib"
+]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Shehriyar Qureshi <thatdevsherry@gmail.com>"]
+description = "ONVIF implementation in Rust"
+edition = "2021"
