@@ -6,3 +6,10 @@ description.workspace = true
 edition.workspace = true
 
 [dependencies]
+reqwest = { version = "0.11", features = ["json"] }
+log = "0.4.17"
+tokio = { version = "1.21.2", features = ["full"] }
+anyhow = "1.0.65"
+serde = { version = "1.0.145", features = ["derive"] }
+quick-xml = { version = "0.25.0", features = ["serialize"]}
+uuid = { version = "1.2.1", features = ["v4","fast-rng","macro-diagnostics" ]}

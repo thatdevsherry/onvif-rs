@@ -6,4 +6,8 @@ description.workspace = true
 edition.workspace = true
 
 [dependencies]
+clap = "4.0.10"
+env_logger = "0.9.1"
 lib = { path = "../lib"}
+log = "0.4.17"
+tokio = { version = "1.21.2", features = ["full"] }
