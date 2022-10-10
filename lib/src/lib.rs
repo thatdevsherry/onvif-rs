@@ -15,7 +15,18 @@ pub async fn testing() -> Result<()> {
     </s:Envelope>"#;
     let output_in_xml: Envelope<GetSystemDateAndTimeResponse> =
         quick_xml::de::from_str(&suppose_output)?;
-    debug!("SOAP response wrapped in envelope: {:?}", output_in_xml);
+    debug!("SOAP of date_time: {:?}", output_in_xml);
+    let some_other_response = r#"
+    <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope">
+    <s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <SomeOtherSoapResponse xmlns="http://www.onvif.org/ver10/device/wsdl">
+    <Test>This is test beep boop</Test>
+    </SomeOtherSoapResponse>
+    </s:Body>
+    </s:Envelope>"#;
+    let output_of_other_soap_in_xml: Envelope<SomeOtherSoapResponse> =
+        quick_xml::de::from_str(&some_other_response)?;
+    debug!("SOAP of sample request: {:?}", output_of_other_soap_in_xml);
     Ok(())
 }
 
@@ -38,7 +49,6 @@ struct Envelope<T: ResponseType> {
 struct Body<T: ResponseType> {
     // Rename here is a literal, we might have to implement
     // our own serializer?
-    #[serde(rename = "GetSystemDateAndTimeResponse")]
     payload: T,
 }
 
@@ -47,6 +57,20 @@ struct Body<T: ResponseType> {
 struct GetSystemDateAndTimeResponse {
     #[serde(rename = "TimeZone")]
     time_zone: String,
+}
+
+/// Another ONVIF response sample
+/// so we can test this out with generics
+#[derive(Debug, Serialize, Deserialize)]
+struct SomeOtherSoapResponse {
+    #[serde(rename = "Test")]
+    sample_field: String,
+}
+
+impl ResponseType for SomeOtherSoapResponse {
+    fn response_type() -> &'static str {
+        "SomeOtherSoapResponse"
+    }
 }
 
 /// Have each ONVIF response implement a trait
