@@ -22,7 +22,7 @@ pub async fn testing() -> Result<()> {
 /// Envelope is a header for SOAP requests
 /// and always has a `Body`
 #[derive(Debug, Deserialize, Serialize)]
-struct Envelope<T> {
+struct Envelope<T: ResponseType> {
     #[serde(rename = "Body")]
     body: Body<T>,
 }
@@ -35,7 +35,7 @@ struct Envelope<T> {
 /// So I'm looking at somehow serializing this Body to return
 /// the payload it is wrapping.
 #[derive(Debug, Deserialize, Serialize)]
-struct Body<T> {
+struct Body<T: ResponseType> {
     // Rename here is a literal, we might have to implement
     // our own serializer?
     #[serde(rename = "GetSystemDateAndTimeResponse")]
