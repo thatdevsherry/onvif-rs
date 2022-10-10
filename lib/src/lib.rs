@@ -14,19 +14,27 @@ pub async fn testing() -> Result<()> {
     </s:Body>
     </s:Envelope>"#;
     let output_in_xml: Envelope = quick_xml::de::from_str(&suppose_output)?;
-    debug!(" play with SOAP response: {:?}", output_in_xml);
+    debug!("SOAP response wrapped in envelope: {:?}", output_in_xml);
     Ok(())
 }
 
+/// Envelope is a header for SOAP requests
+/// and always has a `Body`
 #[derive(Debug, Deserialize, Serialize)]
 struct Envelope {
     #[serde(rename = "Body")]
     body: Body,
 }
 
+/// This is supposed to contain our payload
+/// Adding a sample field in it
 #[derive(Debug, Deserialize, Serialize)]
-struct Body {}
+struct Body {
+    #[serde(rename = "GetSystemDateAndTimeResponse")]
+    payload: GetSystemDateAndTimeResponse,
+}
 
+/// ONVIF WSDL for GetSystemDateAndTimeResponse
 #[derive(Debug, Serialize, Deserialize)]
 struct GetSystemDateAndTimeResponse {
     #[serde(rename = "TimeZone")]
