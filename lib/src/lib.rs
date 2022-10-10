@@ -1,3 +1,48 @@
-pub fn test() -> String {
-    return String::from("Hello world");
+#[macro_use]
+extern crate log;
+
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+
+pub async fn testing() -> Result<()> {
+    let suppose_output = r#"
+    <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope">
+    <s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <GetSystemDateAndTimeResponse xmlns="http://www.onvif.org/ver10/device/wsdl">
+    <TimeZone>PKT</TimeZone>
+    </GetSystemDateAndTimeResponse>
+    </s:Body>
+    </s:Envelope>"#;
+    let output_in_xml: Envelope = quick_xml::de::from_str(&suppose_output)?;
+    debug!(" play with SOAP response: {:?}", output_in_xml);
+    Ok(())
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct Envelope {
+    #[serde(rename = "Body")]
+    body: Body,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct Body {}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct GetSystemDateAndTimeResponse {
+    #[serde(rename = "TimeZone")]
+    time_zone: String,
+}
+
+/// Have each ONVIF response implement a trait
+/// which in this case would be the SOAP response name
+/// as defined in their WSDL
+trait ResponseType {
+    fn response_type() -> &'static str;
+}
+
+/// Implement the trait for our sample ONVIF response
+impl ResponseType for GetSystemDateAndTimeResponse {
+    fn response_type() -> &'static str {
+        "GetSystemDateAndTimeResponse"
+    }
 }
