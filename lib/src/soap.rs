@@ -8,9 +8,7 @@ pub trait Soap<T: OnvifOperation> {
 
 impl<T: OnvifOperation> Soap<T> for T {
     fn apply_soap(self) -> Envelope<T> {
-        Envelope {
-            body: Body { payload: self },
-        }
+        Envelope::new(self)
     }
 }
 
@@ -47,5 +45,21 @@ impl<T: OnvifOperation + Serialize> Serialize for Envelope<T> {
         let mut state = serializer.serialize_map(Some(1))?;
         state.serialize_entry("Envelope", &self.body)?;
         state.end()
+    }
+}
+
+impl<T: OnvifOperation> Envelope<T> {
+    pub fn new(onvif_operation: T) -> Self {
+        Envelope {
+            body: Body::new(onvif_operation),
+        }
+    }
+}
+
+impl<T: OnvifOperation> Body<T> {
+    pub fn new(onvif_operation: T) -> Body<T> {
+        Body {
+            payload: onvif_operation,
+        }
     }
 }
