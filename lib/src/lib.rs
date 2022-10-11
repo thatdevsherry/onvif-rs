@@ -1,14 +1,16 @@
-mod get_system_date_and_time;
 mod onvif_operation;
 mod soap;
+mod wsdl;
+use soap::Soap;
+use wsdl::get_system_date_and_time::{GetSystemDateAndTime, GetSystemDateAndTimeResponse};
 
 #[macro_use]
 extern crate log;
 
+// use crate::get_system_date_and_time::GetSystemDateAndTime;
 use anyhow::Result;
-use get_system_date_and_time::GetSystemDateAndTime;
 
-use crate::{get_system_date_and_time::GetSystemDateAndTimeResponse, soap::Soap};
+// use crate::{get_system_date_and_time::GetSystemDateAndTimeResponse, soap::Soap};
 
 pub async fn get_system_date_and_time() -> Result<()> {
     let get_system_date_and_time = GetSystemDateAndTime {};
