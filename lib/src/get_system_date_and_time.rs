@@ -11,6 +11,7 @@ impl OnvifOperation for GetSystemDateAndTime {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GetSystemDateAndTimeResponse {}
 
 impl OnvifOperation for GetSystemDateAndTimeResponse {
