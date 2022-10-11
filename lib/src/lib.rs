@@ -1,5 +1,7 @@
+pub mod discovery;
 mod onvif_operation;
 mod soap;
+// mod discovery;
 mod wsdl;
 use soap::Soap;
 use wsdl::get_system_date_and_time::{GetSystemDateAndTime, GetSystemDateAndTimeResponse};

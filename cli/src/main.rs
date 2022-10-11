@@ -8,6 +8,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("ONVIF-rs started");
 
     // start messing around with XML
-    lib::get_system_date_and_time().await?;
+    // lib::get_system_date_and_time().await?;
+    lib::discovery::discover().await?;
     Ok(())
 }
