@@ -31,13 +31,16 @@ impl Default for Probe {
             types: Types {
                 value: "NetworkVideoTransmitter".to_string(),
             },
-            scopes: Scopes {},
+            scopes: Scopes { value: None },
         };
     }
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct Scopes {}
+pub struct Scopes {
+    #[serde(rename = "$value")]
+    value: Option<String>,
+}
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct ProbeMatches {
