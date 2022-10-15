@@ -1,14 +1,11 @@
 #[macro_use]
 extern crate log;
 
-pub mod discovery;
 mod onvif_operation;
+mod operations;
 mod soap;
 mod wsdl;
-use std::{
-    fmt::format,
-    net::{IpAddr, SocketAddr},
-};
+use std::net::SocketAddr;
 
 use onvif_operation::OnvifOperation;
 use serde::Serialize;
@@ -35,19 +32,4 @@ fn create_soap_request<T: OnvifOperation + Serialize>(onvif_operation: T) -> Res
     let soap_request = onvif_operation.apply_soap();
     let soap_request_string = quick_xml::se::to_string(&soap_request)?;
     Ok(soap_request_string)
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{create_soap_request, wsdl::get_system_date_and_time::GetSystemDateAndTime};
-
-    #[test]
-    fn test_soap_request_creation_for_get_system_date_and_time() {
-        let get_system_date_and_time = GetSystemDateAndTime {};
-        let soap_request_string = create_soap_request(get_system_date_and_time).unwrap();
-        assert_eq!(
-            "<Envelope><Body><GetSystemDateAndTime/></Body></Envelope>",
-            soap_request_string
-        );
-    }
 }
