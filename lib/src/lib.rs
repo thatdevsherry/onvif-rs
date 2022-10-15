@@ -1,32 +1,53 @@
-pub mod discovery;
-mod onvif_operation;
-mod soap;
-// mod discovery;
-mod wsdl;
-use soap::Soap;
-use wsdl::get_system_date_and_time::{GetSystemDateAndTime, GetSystemDateAndTimeResponse};
-
 #[macro_use]
 extern crate log;
 
-// use crate::get_system_date_and_time::GetSystemDateAndTime;
+pub mod discovery;
+mod onvif_operation;
+mod soap;
+mod wsdl;
+use std::{
+    fmt::format,
+    net::{IpAddr, SocketAddr},
+};
+
+use onvif_operation::OnvifOperation;
+use serde::Serialize;
+use soap::Soap;
+use wsdl::get_system_date_and_time::GetSystemDateAndTime;
+
 use anyhow::Result;
 
-// use crate::{get_system_date_and_time::GetSystemDateAndTimeResponse, soap::Soap};
+pub async fn get_system_date_and_time(addr: SocketAddr) -> Result<String> {
+    let request_payload = GetSystemDateAndTime {};
+    let soap_request_string = create_soap_request(request_payload)?;
+    debug!("Soap request: {:?}", soap_request_string);
+    let client = reqwest::Client::new();
+    let res = client
+        .post(format!("http://{}/onvif/device_service", addr.to_string()))
+        .body(soap_request_string)
+        .header("Content-Type", "application/soap+xml")
+        .send()
+        .await?;
+    Ok(res.text().await?)
+}
 
-pub async fn get_system_date_and_time() -> Result<()> {
-    let get_system_date_and_time = GetSystemDateAndTime {};
-    let envelope = get_system_date_and_time.apply_soap();
-    let envelope_serialize = quick_xml::se::to_string(&envelope)?;
-    debug!("Envelope serialized: {:?}", envelope_serialize);
+fn create_soap_request<T: OnvifOperation + Serialize>(onvif_operation: T) -> Result<String> {
+    let soap_request = onvif_operation.apply_soap();
+    let soap_request_string = quick_xml::se::to_string(&soap_request)?;
+    Ok(soap_request_string)
+}
 
-    let get_system_date_and_time_response = GetSystemDateAndTimeResponse {};
-    let response_wrapped_in_soap = get_system_date_and_time_response.apply_soap();
-    let another_soapy_request_serialized = quick_xml::se::to_string(&response_wrapped_in_soap)?;
-    debug!(
-        "Yet another soapy request: {:?}",
-        another_soapy_request_serialized
-    );
+#[cfg(test)]
+mod tests {
+    use crate::{create_soap_request, wsdl::get_system_date_and_time::GetSystemDateAndTime};
 
-    Ok(())
+    #[test]
+    fn test_soap_request_creation_for_get_system_date_and_time() {
+        let get_system_date_and_time = GetSystemDateAndTime {};
+        let soap_request_string = create_soap_request(get_system_date_and_time).unwrap();
+        assert_eq!(
+            "<Envelope><Body><GetSystemDateAndTime/></Body></Envelope>",
+            soap_request_string
+        );
+    }
 }
