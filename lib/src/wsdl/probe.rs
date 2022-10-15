@@ -39,7 +39,7 @@ impl Default for Probe {
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Scopes {
     #[serde(rename = "$value")]
-    value: Option<String>,
+    pub value: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -59,29 +59,29 @@ pub struct ProbeMatch {
     #[serde(rename = "EndpointReference")]
     pub endpoint_reference: EndpointReference,
     #[serde(rename = "Types")]
-    types: Types,
+    pub types: Types,
     #[serde(rename = "Scopes")]
-    scopes: Scopes,
+    pub scopes: Scopes,
     #[serde(rename = "XAddrs")]
-    xaddrs: XAddrs,
+    pub xaddrs: XAddrs,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct XAddrs {
     #[serde(rename = "$value")]
-    value: String,
+    pub value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct EndpointReference {
     #[serde(rename = "Address")]
-    address: Address,
+    pub address: Address,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Address {
     #[serde(rename = "$value")]
-    urn: String,
+    pub urn: String,
 }
 
 #[cfg(test)]
