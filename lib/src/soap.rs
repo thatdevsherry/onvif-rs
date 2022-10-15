@@ -19,7 +19,12 @@ impl<T: OnvifOperation> Soap<T> for T {
 pub struct Envelope<T: OnvifOperation> {
     #[serde(rename = "Body")]
     body: Body<T>,
+    #[serde(rename = "Header")]
+    header: Option<Header>,
 }
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct Header {}
 
 #[derive(Debug, PartialEq, Deserialize)]
 #[serde(try_from = "HashMap<String, T>")]
@@ -73,6 +78,7 @@ impl<T: OnvifOperation> Envelope<T> {
     fn new(onvif_operation: T) -> Self {
         Envelope {
             body: Body::new(onvif_operation),
+            header: None,
         }
     }
 }
@@ -90,6 +96,7 @@ mod tests {
             body: Body {
                 payload: GetSystemDateAndTime {},
             },
+            header: None,
         };
         let sample_operation = GetSystemDateAndTime {};
         let actual = sample_operation.apply_soap();
