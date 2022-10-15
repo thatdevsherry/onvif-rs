@@ -6,7 +6,7 @@ description.workspace = true
 edition.workspace = true
 
 [dependencies]
-clap = "4.0.10"
+clap = { version = "4.0.10", features = ["derive"] }
 env_logger = "0.9.1"
 lib = { path = "../lib"}
 log = "0.4.17"

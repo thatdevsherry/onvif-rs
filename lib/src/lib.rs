@@ -2,7 +2,7 @@
 extern crate log;
 
 mod onvif_operation;
-mod operations;
+pub mod operations;
 mod soap;
 mod wsdl;
 use std::net::SocketAddr;
