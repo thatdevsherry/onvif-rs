@@ -26,6 +26,12 @@ pub struct Types {
 }
 
 impl Default for Probe {
+    /// Creates a probe that requests to receive responses from `NetworkVideoTransmitter`.
+    ///
+    /// ## ONVIF definition
+    ///
+    /// Network video server (an IP network camera or an encoder device, for example) that sends media data over an IP
+    /// network to a client.
     fn default() -> Self {
         return Probe {
             types: Types {
