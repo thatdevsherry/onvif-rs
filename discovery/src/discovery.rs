@@ -2,8 +2,7 @@ use serde::{Deserialize, Serialize};
 use tokio::net::UdpSocket;
 
 use anyhow::Result;
-const WS_DISCOVERY_IP_MULTICAST_ADDRESS: &str = "239.255.255.250";
-const WS_DISCOVERY_PORT: &str = "3702";
+const WS_DISCOVERY_IP_MULTICAST_ADDRESS: &str = "239.255.255.250:3702";
 const UDP_SOCKET_ADDR: &str = "0.0.0.0:0"; // let OS choose port
 const ONVIF_COUNTRY_PREFIX: &str = "onvif://www.onvif.org/location/country/";
 const ONVIF_PROFILE_PREFIX: &str = "onvif://www.onvif.org/Profile/";
@@ -63,12 +62,9 @@ pub async fn discover_onvif_devices() -> Result<String> {
     let request_as_bytes = serialized.as_bytes();
 
     // Send the Discovery XML to IP Multicast
-    let target = format!(
-        "{}:{}",
-        WS_DISCOVERY_IP_MULTICAST_ADDRESS, WS_DISCOVERY_PORT
-    );
-    debug!("Sending payload to: {}", target);
-    sock.send_to(&request_as_bytes, target).await?;
+    debug!("Sending payload to: {}", WS_DISCOVERY_IP_MULTICAST_ADDRESS);
+    sock.send_to(&request_as_bytes, WS_DISCOVERY_IP_MULTICAST_ADDRESS)
+        .await?;
     debug!("Payload sent");
 
     let mut recv_buf: [u8; 1500] = [0; 1500];
@@ -87,5 +83,6 @@ pub async fn discover_onvif_devices() -> Result<String> {
     let discovery_parsed = DiscoveryParsed::from(removed_soap);
     debug!("Parsed result: {:?}", discovery_parsed);
     let serialize_to_json = serde_json::ser::to_string(&discovery_parsed)?;
+    info!("Result: {}", serialize_to_json);
     Ok(serialize_to_json)
 }
