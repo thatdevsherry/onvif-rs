@@ -54,16 +54,11 @@ pub async fn discover_onvif_devices() -> Result<String> {
     let sock = UdpSocket::bind(UDP_SOCKET_ADDR).await?;
     debug!("Successfully binded: {}", sock.local_addr()?);
 
-    let payload = Probe::default();
-    debug!("Payload: {:?}", payload);
-
-    let lathered_request = payload.apply_soap();
-    let serialized = quick_xml::se::to_string(&lathered_request)?;
-    let request_as_bytes = serialized.as_bytes();
+    let request = prepare_discovery_request()?;
 
     // Send the Discovery XML to IP Multicast
     debug!("Sending payload to: {}", WS_DISCOVERY_IP_MULTICAST_ADDRESS);
-    sock.send_to(&request_as_bytes, WS_DISCOVERY_IP_MULTICAST_ADDRESS)
+    sock.send_to(&request[..], WS_DISCOVERY_IP_MULTICAST_ADDRESS)
         .await?;
     debug!("Payload sent");
 
@@ -72,7 +67,24 @@ pub async fn discover_onvif_devices() -> Result<String> {
     let n = sock.recv(&mut recv_buf).await?;
     debug!("We received something of size: {}", n);
     info!("Found a device");
-    let response_string = String::from_utf8_lossy(&recv_buf).into_owned();
+
+    let serialize_to_json = handle_ws_discovery_response(&recv_buf[..n])?;
+
+    Ok(serialize_to_json)
+}
+
+fn prepare_discovery_request() -> Result<Vec<u8>> {
+    let payload = Probe::default();
+    debug!("Payload: {:?}", payload);
+
+    let lathered_request = payload.apply_soap();
+    let serialized = quick_xml::se::to_string(&lathered_request)?;
+    let request_as_bytes = serialized.as_bytes().to_owned();
+    Ok(request_as_bytes)
+}
+
+fn handle_ws_discovery_response(response: &[u8]) -> Result<String> {
+    let response_string = String::from_utf8_lossy(&response).into_owned();
     debug!("Response: {}", response_string);
     let deserialize_response =
         quick_xml::de::from_str::<Envelope<ProbeMatches>>(&response_string).unwrap();
