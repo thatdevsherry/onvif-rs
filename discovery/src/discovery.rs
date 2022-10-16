@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use tokio::net::UdpSocket;
 
 use anyhow::Result;
-const WS_DISCOVERY_IP_MULTICAST_ADDRESS: &'static str = "239.255.255.250";
-const WS_DISCOVERY_PORT: &'static str = "3702";
-const UDP_SOCKET_ADDR: &'static str = "0.0.0.0:0"; // let OS choose port
+const WS_DISCOVERY_IP_MULTICAST_ADDRESS: &str = "239.255.255.250";
+const WS_DISCOVERY_PORT: &str = "3702";
+const UDP_SOCKET_ADDR: &str = "0.0.0.0:0"; // let OS choose port
 
 use soap::soap::{Envelope, Soap};
 use wsdl::wsdl::probe::{Probe, ProbeMatches};
