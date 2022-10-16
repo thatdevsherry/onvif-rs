@@ -5,6 +5,9 @@ use anyhow::Result;
 const WS_DISCOVERY_IP_MULTICAST_ADDRESS: &str = "239.255.255.250";
 const WS_DISCOVERY_PORT: &str = "3702";
 const UDP_SOCKET_ADDR: &str = "0.0.0.0:0"; // let OS choose port
+const ONVIF_COUNTRY_PREFIX: &str = "onvif://www.onvif.org/location/country/";
+const ONVIF_PROFILE_PREFIX: &str = "onvif://www.onvif.org/Profile/";
+const ONVIF_NAME_PREFIX: &str = "onvif://www.onvif.org/name/";
 
 use soap::soap::{Envelope, Soap};
 use wsdl::wsdl::probe::{Probe, ProbeMatches};
@@ -16,7 +19,37 @@ pub struct DiscoveryParsed {
     profiles: Vec<String>,
 }
 
-pub async fn discover_onvif_devices() -> Result<()> {
+impl From<ProbeMatches> for DiscoveryParsed {
+    fn from(probe_match: ProbeMatches) -> Self {
+        let string_to_parse = probe_match.probe_match.scopes.value.unwrap();
+        let mut country: Option<String> = None;
+        let mut name: Option<String> = None;
+        let mut profiles: Vec<String> = Vec::new();
+
+        let scopes = string_to_parse.split_whitespace();
+        for scope in scopes {
+            if scope.contains(ONVIF_COUNTRY_PREFIX) {
+                country = Some(scope[ONVIF_COUNTRY_PREFIX.len()..].to_string())
+            }
+            if scope.contains(ONVIF_NAME_PREFIX) {
+                name = Some(scope[ONVIF_NAME_PREFIX.len()..].to_string())
+            }
+            if scope.contains(ONVIF_PROFILE_PREFIX) {
+                profiles.push(scope[ONVIF_PROFILE_PREFIX.len()..].to_string())
+            }
+        }
+
+        Self {
+            country,
+            name,
+            profiles,
+        }
+    }
+}
+
+/// Uses [WS-Discovery](https://en.wikipedia.org/wiki/WS-Discovery) to find
+/// IP Cameras.
+pub async fn discover_onvif_devices() -> Result<String> {
     info!("Preparing to discover devices");
     debug!("Binding socket");
     let sock = UdpSocket::bind(UDP_SOCKET_ADDR).await?;
@@ -48,5 +81,11 @@ pub async fn discover_onvif_devices() -> Result<()> {
     let deserialize_response =
         quick_xml::de::from_str::<Envelope<ProbeMatches>>(&response_string).unwrap();
     debug!("Deserialized response: {:?}", deserialize_response);
-    Ok(())
+
+    let removed_soap = deserialize_response.remove_soap();
+    debug!("Underlying T: {:?}", removed_soap);
+    let discovery_parsed = DiscoveryParsed::from(removed_soap);
+    debug!("Parsed result: {:?}", discovery_parsed);
+    let serialize_to_json = serde_json::ser::to_string(&discovery_parsed)?;
+    Ok(serialize_to_json)
 }
