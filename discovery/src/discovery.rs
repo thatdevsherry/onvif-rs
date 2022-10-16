@@ -6,10 +6,8 @@ const WS_DISCOVERY_IP_MULTICAST_ADDRESS: &'static str = "239.255.255.250";
 const WS_DISCOVERY_PORT: &'static str = "3702";
 const UDP_SOCKET_ADDR: &'static str = "0.0.0.0:0"; // let OS choose port
 
-use crate::{
-    soap::{Envelope, Soap},
-    wsdl::probe::{Probe, ProbeMatch, ProbeMatches},
-};
+use soap::soap::{Envelope, Soap};
+use wsdl::wsdl::probe::{Probe, ProbeMatches};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct DiscoveryParsed {

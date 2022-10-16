@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::onvif_operation::OnvifOperation;
+use onvif::onvif_operation::OnvifOperation;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Probe {

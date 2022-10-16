@@ -1,7 +1,10 @@
 [workspace]
 members = [
     "cli",
-    "lib"
+    "discovery",
+    "soap",
+    "wsdl",
+    "onvif"
 ]
 
 [workspace.package]
