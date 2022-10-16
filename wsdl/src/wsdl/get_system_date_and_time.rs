@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use onvif::onvif_operation::OnvifOperation;
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetSystemDateAndTime {}
 
 impl OnvifOperation for GetSystemDateAndTime {
@@ -11,7 +11,7 @@ impl OnvifOperation for GetSystemDateAndTime {
     }
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetSystemDateAndTimeResponse {}
 
 impl OnvifOperation for GetSystemDateAndTimeResponse {

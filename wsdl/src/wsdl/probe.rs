@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use onvif::onvif_operation::OnvifOperation;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Probe {
     #[serde(rename = "Types")]
     types: Types,
@@ -19,7 +19,7 @@ impl OnvifOperation for Probe {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Types {
     #[serde(rename = "$value")]
     value: String,
@@ -33,22 +33,22 @@ impl Default for Probe {
     /// Network video server (an IP network camera or an encoder device, for example) that sends media data over an IP
     /// network to a client.
     fn default() -> Self {
-        return Probe {
+        Probe {
             types: Types {
                 value: "NetworkVideoTransmitter".to_string(),
             },
             scopes: Scopes { value: None },
-        };
+        }
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Scopes {
     #[serde(rename = "$value")]
     pub value: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct ProbeMatches {
     #[serde(rename = "ProbeMatch")]
     pub probe_match: ProbeMatch,
@@ -60,7 +60,7 @@ impl OnvifOperation for ProbeMatches {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ProbeMatch {
     #[serde(rename = "EndpointReference")]
     pub endpoint_reference: EndpointReference,
@@ -72,19 +72,19 @@ pub struct ProbeMatch {
     pub xaddrs: XAddrs,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct XAddrs {
     #[serde(rename = "$value")]
     pub value: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct EndpointReference {
     #[serde(rename = "Address")]
     pub address: Address,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Address {
     #[serde(rename = "$value")]
     pub urn: String,

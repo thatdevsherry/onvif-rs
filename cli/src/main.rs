@@ -2,7 +2,7 @@
 extern crate log;
 
 use clap::{Parser, Subcommand};
-use discovery;
+use discovery::discovery::discover_onvif_devices;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match cli.operation_type {
         OperationType::Discover {} => {
             debug!("Selection: discovery");
-            discovery::discovery::discover_onvif_devices().await?;
+            discover_onvif_devices().await?;
         }
     }
     Ok(())

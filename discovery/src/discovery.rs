@@ -11,7 +11,7 @@ const ONVIF_NAME_PREFIX: &str = "onvif://www.onvif.org/name/";
 use soap::soap::{Envelope, Soap};
 use wsdl::wsdl::probe::{Probe, ProbeMatches};
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DiscoveryParsed {
     name: Option<String>,
     country: Option<String>,
@@ -84,7 +84,7 @@ fn prepare_discovery_request() -> Result<Vec<u8>> {
 }
 
 fn handle_ws_discovery_response(response: &[u8]) -> Result<String> {
-    let response_string = String::from_utf8_lossy(&response).into_owned();
+    let response_string = String::from_utf8_lossy(response).into_owned();
     debug!("Response: {}", response_string);
     let deserialize_response =
         quick_xml::de::from_str::<Envelope<ProbeMatches>>(&response_string).unwrap();

@@ -14,7 +14,7 @@ impl<T: OnvifOperation> Soap<T> for T {
     }
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct Envelope<T: OnvifOperation> {
     #[serde(rename = "Body")]
     pub body: Body<T>,
@@ -22,10 +22,10 @@ pub struct Envelope<T: OnvifOperation> {
     pub header: Option<Header>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Header {}
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize)]
 #[serde(try_from = "HashMap<String, T>")]
 pub struct Body<T: OnvifOperation> {
     pub payload: T,
