@@ -21,6 +21,8 @@ pub struct DiscoveryParsed {
 impl From<ProbeMatches> for DiscoveryParsed {
     fn from(probe_match: ProbeMatches) -> Self {
         let string_to_parse = probe_match.probe_match.scopes.value.unwrap();
+
+        // TODO(Shehriyar Qureshi): Maybe use the `iter().map()` type of flow instead of doing this mut stuff?
         let mut country: Option<String> = None;
         let mut name: Option<String> = None;
         let mut profiles: Vec<String> = Vec::new();
@@ -62,6 +64,7 @@ pub async fn discover_onvif_devices() -> Result<String> {
         .await?;
     debug!("Payload sent");
 
+    // TODO(Shehriyar Qureshi): Handle multiple responses
     let mut recv_buf: [u8; 1500] = [0; 1500];
     debug!("Listening for response");
     let n = sock.recv(&mut recv_buf).await?;
@@ -73,6 +76,7 @@ pub async fn discover_onvif_devices() -> Result<String> {
     Ok(serialize_to_json)
 }
 
+/// Builds the WS-Discovery request for NVTs and returns the request as bytes
 fn prepare_discovery_request() -> Result<Vec<u8>> {
     let payload = Probe::default();
     debug!("Payload: {:?}", payload);
@@ -83,6 +87,7 @@ fn prepare_discovery_request() -> Result<Vec<u8>> {
     Ok(request_as_bytes)
 }
 
+/// Processes WS-Discovery response and returns parsed data
 fn handle_ws_discovery_response(response: &[u8]) -> Result<String> {
     let response_string = String::from_utf8_lossy(response).into_owned();
     debug!("Response: {}", response_string);
@@ -97,4 +102,29 @@ fn handle_ws_discovery_response(response: &[u8]) -> Result<String> {
     let serialize_to_json = serde_json::ser::to_string(&discovery_parsed)?;
     info!("Result: {}", serialize_to_json);
     Ok(serialize_to_json)
+}
+
+#[cfg(test)]
+mod tests {
+    use wsdl::wsdl::probe::{EndpointReference, ProbeMatch, ProbeMatches, Scopes, Types, XAddrs};
+
+    use super::DiscoveryParsed;
+
+    #[test]
+    fn test_parsing_discovery_response() {
+        let discovery_response = ProbeMatches {
+            probe_match: ProbeMatch {
+                scopes: Scopes { value: Some("onvif://www.onvif.org/location/country/pakistan onvif://www.onvif.org/Profile/Streaming onvif://www.onvif.org/name/IP-Camera-Cool onvif://www.onvif.org/Profile/T".to_string()) },
+                endpoint_reference: EndpointReference::default() ,
+                types: Types { value: "".to_string() },
+                xaddrs: XAddrs {value: "".to_string()}
+                }
+            };
+        let discovery_parsed = DiscoveryParsed::from(discovery_response);
+        assert_eq!(discovery_parsed.country, Some("pakistan".to_string()));
+        assert_eq!(discovery_parsed.name, Some("IP-Camera-Cool".to_string()));
+        assert_eq!(discovery_parsed.profiles.len(), 2);
+        assert!(discovery_parsed.profiles.contains(&"Streaming".to_string()));
+        assert!(discovery_parsed.profiles.contains(&"T".to_string()));
+    }
 }

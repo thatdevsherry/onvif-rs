@@ -22,13 +22,13 @@ impl OnvifOperation for Probe {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Types {
     #[serde(rename = "$value")]
-    value: String,
+    pub value: String,
 }
 
 impl Default for Probe {
     /// Creates a probe that requests to receive responses from `NetworkVideoTransmitter`.
     ///
-    /// ## ONVIF definition
+    /// ## ONVIF definition for NVT
     ///
     /// Network video server (an IP network camera or an encoder device, for example) that sends media data over an IP
     /// network to a client.
@@ -78,13 +78,13 @@ pub struct XAddrs {
     pub value: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub struct EndpointReference {
     #[serde(rename = "Address")]
     pub address: Address,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub struct Address {
     #[serde(rename = "$value")]
     pub urn: String,
