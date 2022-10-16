@@ -10,6 +10,8 @@ jobs:
     name: onvif-rs on armv7
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt install libssl-dev -y # reqwest fails on ssl
+
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
