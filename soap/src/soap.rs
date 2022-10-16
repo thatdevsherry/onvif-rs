@@ -80,6 +80,10 @@ impl<T: OnvifOperation> Envelope<T> {
             header: None,
         }
     }
+
+    pub fn remove_soap(self) -> T {
+        self.body.payload
+    }
 }
 
 #[cfg(test)]
